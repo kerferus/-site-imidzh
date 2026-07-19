@@ -12,6 +12,25 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;500;700&family=JetBrains+Mono:wght@500&display=swap&subset=cyrillic,cyrillic-ext,latin" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
+
+<!-- Детектор Telegram WebView -->
+<script>
+  (function() {
+    var isTelegram = false;
+    // Проверяем user-agent
+    if (navigator.userAgent.indexOf('Telegram') !== -1) {
+      isTelegram = true;
+    }
+    // Проверяем наличие Telegram WebView
+    if (window.TelegramWebviewProxy !== undefined) {
+      isTelegram = true;
+    }
+    if (isTelegram) {
+      document.documentElement.classList.add('telegram');
+      console.log('Обнаружен Telegram WebView — включен упрощенный режим');
+    }
+  })();
+</script>
 </head>
 <body>
 
