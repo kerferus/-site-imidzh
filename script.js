@@ -1,6 +1,9 @@
 document.documentElement.classList.add('js');
-const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const FINE = matchMedia('(hover:hover) and (pointer:fine)').matches;
+
+// ===== ОБНАРУЖЕНИЕ TELEGRAM =====
+const isTelegram = document.documentElement.classList.contains('telegram');
+const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches || isTelegram;
+const FINE = matchMedia('(hover:hover) and (pointer:fine)').matches && !isTelegram;
 
 /* ---------- Карусель рилсов ---------- */
 const REELS = [
@@ -71,7 +74,7 @@ const countIo = new IntersectionObserver((es) => {
 }, { threshold: 0.5 });
 document.querySelectorAll('.stat-n[data-count]').forEach((el) => countIo.observe(el));
 
-/* ---------- Сплит заголовка по словам ---------- */
+/* ---------- Сплит заголовка по словам (отключается в Telegram) ---------- */
 const splitEl = document.querySelector('[data-split]');
 if (splitEl && !REDUCE) {
   const out = [];
@@ -88,9 +91,15 @@ if (splitEl && !REDUCE) {
     w.style.transition = `transform .6s cubic-bezier(.2,.7,.2,1) ${i * 0.05}s, opacity .6s ${i * 0.05}s`;
     requestAnimationFrame(() => { w.style.transform = 'none'; w.style.opacity = '1'; });
   });
+} else if (splitEl) {
+  // В Telegram просто показываем заголовок без анимации
+  splitEl.querySelectorAll('.word').forEach((w) => {
+    w.style.opacity = '1';
+    w.style.transform = 'none';
+  });
 }
 
-/* ---------- Кастомный курсор + магнит + тилт ---------- */
+/* ---------- Кастомный курсор + магнит + тилт (отключается в Telegram) ---------- */
 if (FINE && !REDUCE) {
   const cur = document.querySelector('.cursor');
   const dot = document.querySelector('.cursor-dot');
@@ -125,44 +134,50 @@ if (FINE && !REDUCE) {
   if (lens) addEventListener('mousemove', (e) => {
     lens.style.transform = `translate(${(e.clientX / innerWidth - 0.5) * -30}px, ${(e.clientY / innerHeight - 0.5) * -22}px)`;
   });
+} else {
+  // В Telegram скрываем курсор
+  const cur = document.querySelector('.cursor');
+  if (cur) cur.style.display = 'none';
 }
 
-/* ---------- Бегущая строка с инерцией от скролла ---------- */
-const track = document.getElementById('ticker');
-if (track && !REDUCE) {
-  let x = 0, base = 0.55, boost = 0, last = scrollY, half = 0;
-  const measure = () => { half = track.scrollWidth / 2; };
-  measure(); addEventListener('resize', measure);
-  addEventListener('scroll', () => { boost = Math.min(8, Math.abs(scrollY - last) * 0.4); last = scrollY; }, { passive: true });
-  (function loop() {
-    x -= base + boost; boost *= 0.9;
-    if (half && Math.abs(x) >= half) x = 0;
-    track.style.transform = `translateX(${x}px)`;
-    requestAnimationFrame(loop);
-  })();
-}
+/* ---------- Бегущая строка с инерцией от скролла (отключается в Telegram) ---------- */
+if (!isTelegram) {
+  const track = document.getElementById('ticker');
+  if (track && !REDUCE) {
+    let x = 0, base = 0.55, boost = 0, last = scrollY, half = 0;
+    const measure = () => { half = track.scrollWidth / 2; };
+    measure(); addEventListener('resize', measure);
+    addEventListener('scroll', () => { boost = Math.min(8, Math.abs(scrollY - last) * 0.4); last = scrollY; }, { passive: true });
+    (function loop() {
+      x -= base + boost; boost *= 0.9;
+      if (half && Math.abs(x) >= half) x = 0;
+      track.style.transform = `translateX(${x}px)`;
+      requestAnimationFrame(loop);
+    })();
+  }
 
-/* ---------- AI-строка (обратное движение) ---------- */
-const trackAi = document.getElementById('ticker-ai');
-if (trackAi && !REDUCE) {
-  let x = 0, half = 0;
-  const measure = () => { half = trackAi.scrollWidth / 2; x = -half; };
-  measure(); addEventListener('resize', measure);
-  (function loop() {
-    x += 0.4;
-    if (half && x >= 0) x = -half;
-    trackAi.style.transform = `translateX(${x}px)`;
-    requestAnimationFrame(loop);
-  })();
-}
+  /* ---------- AI-строка (обратное движение) ---------- */
+  const trackAi = document.getElementById('ticker-ai');
+  if (trackAi && !REDUCE) {
+    let x = 0, half = 0;
+    const measure = () => { half = trackAi.scrollWidth / 2; x = -half; };
+    measure(); addEventListener('resize', measure);
+    (function loop() {
+      x += 0.4;
+      if (half && x >= 0) x = -half;
+      trackAi.style.transform = `translateX(${x}px)`;
+      requestAnimationFrame(loop);
+    })();
+  }
 
-/* ---------- Параллакс фото-бэнда ---------- */
-const band = document.querySelector('.band img');
-if (band && !REDUCE) {
-  addEventListener('scroll', () => {
-    const r = band.parentElement.getBoundingClientRect();
-    if (r.bottom > 0 && r.top < innerHeight) band.style.transform = `translateY(${(r.top * -0.08)}px)`;
-  }, { passive: true });
+  /* ---------- Параллакс фото-бэнда ---------- */
+  const band = document.querySelector('.band img');
+  if (band && !REDUCE) {
+    addEventListener('scroll', () => {
+      const r = band.parentElement.getBoundingClientRect();
+      if (r.bottom > 0 && r.top < innerHeight) band.style.transform = `translateY(${(r.top * -0.08)}px)`;
+    }, { passive: true });
+  }
 }
 
 /* ---------- Лайтбокс ---------- */
