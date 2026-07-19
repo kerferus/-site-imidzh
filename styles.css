@@ -424,3 +424,73 @@ body.recording{box-shadow:inset 0 0 0 2px rgba(242,89,61,.4)}
 @media(max-width:420px){
   .stats{grid-template-columns:1fr}
 }
+/* ===== Telegram WebView — фиксы ===== */
+
+/* Отключаем все "стеклянные" эффекты в Telegram */
+.telegram .glass {
+  background: rgba(20, 18, 16, 0.92) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  border-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* Отключаем блик на стекле */
+.telegram .glass::before {
+  display: none !important;
+}
+
+/* Отключаем кастомный курсор */
+.telegram .cursor {
+  display: none !important;
+}
+
+/* Отключаем анимацию блобов (они тормозят) */
+.telegram .blob {
+  animation: none !important;
+  opacity: 0.15 !important;
+}
+
+/* Отключаем зерно */
+.telegram .grain {
+  display: none !important;
+}
+
+/* Отключаем анимацию сплит-заголовка */
+.telegram .word {
+  transform: none !important;
+  opacity: 1 !important;
+  transition: none !important;
+}
+
+/* Фикс для position: fixed в Telegram */
+.telegram .viewfinder {
+  display: none !important;
+}
+
+/* Отключаем параллакс */
+.telegram .lens {
+  display: none !important;
+}
+
+/* Делаем фон чище */
+.telegram body {
+  background: #0a0908 !important;
+}
+
+/* Отключаем hover-эффекты на карточках (они не работают на таче) */
+.telegram .card:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.telegram .card-more {
+  grid-template-rows: 1fr !important;
+  opacity: 1 !important;
+  margin-top: 16px !important;
+}
+
+/* Отключаем анимацию героя */
+.telegram .hero-collage {
+  animation: none !important;
+  opacity: 0.12 !important;
+}
